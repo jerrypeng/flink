@@ -14,7 +14,7 @@ public class WordCountJerry {
 
     DataStream<Tuple2<String, Integer>> dataStream = env
             .socketTextStream("localhost", 9999)
-            .flatMap(new Splitter())
+            .flatMap(new Tokenizer())
             .groupBy(0)
             .sum(1);
 
@@ -27,13 +27,30 @@ public class WordCountJerry {
     }
   }
 
-  public static class Splitter implements FlatMapFunction<String, Tuple2<String, Integer>> {
+  public static final class Tokenizer implements FlatMapFunction<String, Tuple2<String, Integer>> {
+    private static final long serialVersionUID = 1L;
+
     @Override
-    public void flatMap(String sentence, Collector<Tuple2<String, Integer>> out) throws Exception {
-      for (String word: sentence.split(" ")) {
-        out.collect(new Tuple2<String, Integer>(word, 1));
+    public void flatMap(String value, Collector<Tuple2<String, Integer>> out)
+            throws Exception {
+      // normalize and split the line
+      String[] tokens = value.toLowerCase().split("\\W+");
+
+      // emit the pairs
+      for (String token : tokens) {
+        if (token.length() > 0) {
+          out.collect(new Tuple2<String, Integer>(token, 1));
+        }
       }
     }
   }
+//  public static class Splitter implements FlatMapFunction<String, Tuple2<String, Integer>> {
+//    @Override
+//    public void flatMap(String sentence, Collector<Tuple2<String, Integer>> out) throws Exception {
+//      for (String word: sentence.split(" ")) {
+//        out.collect(new Tuple2<String, Integer>(word, 1));
+//      }
+//    }
+//  }
 
 }
