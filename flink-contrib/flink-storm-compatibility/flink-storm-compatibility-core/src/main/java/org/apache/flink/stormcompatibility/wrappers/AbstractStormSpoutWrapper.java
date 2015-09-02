@@ -99,7 +99,7 @@ public abstract class AbstractStormSpoutWrapper<OUT> extends RichParallelSourceF
 	@Override
 	public final void run(final SourceContext<OUT> ctx) throws Exception {
 		this.collector = new StormSpoutCollector<OUT>(this.numberOfAttributes, ctx);
-		this.spout.open(null,
+		this.spout.open(new HashMap(),
 				StormWrapperSetupHelper
 				.convertToTopologyContext((StreamingRuntimeContext) super.getRuntimeContext(), true),
 				new SpoutOutputCollector(this.collector));
